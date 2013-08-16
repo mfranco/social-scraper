@@ -29,12 +29,6 @@ class ApiBaseTestCase(unittest.TestCase):
         except OSError:
             pass
 
-    def json_request_with_credentials(self, url, data={}, method='post',
-                                      headers=[], access_token=None, username=''):
-        headers.append(('api_access_token', access_token))
-        headers.append(('api_username', username))
-        return self.json_request(url, data=data, method=method, headers=headers)
-
     def json_request(self, url, data={}, method='post', headers=[]):
         headers.append(('Content-Type', 'application/json'))
         json_data = json.dumps(data)
@@ -82,20 +76,3 @@ class ModelTestFactory(object):
         return '{0}@{1}.com'.format(ModelTestFactory.create_unique_string(),
                                     ModelTestFactory.create_unique_string())
 
-    @classmethod
-    def get_user(cls, **kwargs):
-        if 'email' not in kwargs:
-            kwargs['email'] = ModelTestFactory.create_unique_email()
-
-        if 'username' not in kwargs:
-            kwargs['username'] = ModelTestFactory.create_unique_string()
-
-        if 'first_name' not in kwargs:
-            kwargs['first_name'] = ModelTestFactory.create_unique_string()
-
-        if 'last_name' not in kwargs:
-            kwargs['last_name'] = ModelTestFactory.create_unique_string()
-
-        obj = User(**kwargs)
-        obj.add()
-        return obj

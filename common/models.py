@@ -96,6 +96,11 @@ class BaseModel(Base, JsonSerializer):
         for name, value in kwargs.items():
             setattr(self, name, value)
 
+    @classmethod
+    def enum(cls, **enums):
+        """http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python"""
+        return type('Enum', (), enums)
+
     def close_session(self):
         if self.session:
             self.session.close_all()

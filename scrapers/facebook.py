@@ -35,13 +35,10 @@ class FacebookScraper(BaseScraper):
         for div in search_results.find_all('div', class_='detailedsearch_result'):
             try:
                 jdata = json.loads(json_data_regular.search(str(div)).group('json_content'))
-                """
-                for item, value in jdata.items():
-                    print '{0}: {1} \n'.format(item, value)
-                """
                 html_profile = self.get_profile_by_url(jdata['cururl'])
                 name = name_regular.search(html_profile).group('name')
-                user = User(name=name, username=jdata['id'], json_context=jdata)
+                user = User(name=name, username=jdata['id'],
+                            json_context=jdata, source=User.SOURCE_ENUM.FACEBOOK)
                 user.add()
             except Exception as error:
                 print error

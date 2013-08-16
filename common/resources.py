@@ -31,3 +31,13 @@ class BaseResource(object):
 
     def delete(self):
         self.__model__.delete()
+
+    def filter_by(self, *args, **kwargs):
+        resource_list = []
+        for model in self.__model__.objects.filter_by(*args, **kwargs):
+            try:
+                resource_list.append(model.to_serializable_dict())
+            except:
+                pass
+        return resource_list
+

@@ -32,31 +32,33 @@ class TwitterScraper(BaseScraper):
         page =  BeautifulSoup(content)
         search_results = page.find(id='stream-items-id')
         regular_username = re.compile(r'data-user-id=".*" href="/(?P<username>.*)"')
-        for div in search_results.find_all('div', class_='stream-item-header'):
-            username = regular_username.search(str(div)).group('username')
+
+        def check_username(username):
+            """Twitter search return users and twits with the term so we need to make sure that
+               the username match with the search term before perform the insertion, if the seacrh
+               term is compounded by most than one word we split the string a try to find a partial match
+               by every word
+            """
             for t in term.split(' '):
                 if t.lower() in username.lower():
-                    self.get_profile()
-                    break
-        return 0
+                    return True
+            return False
 
-        json_data_regular = re.compile(r'{ search_logged_ajax\((?P<json_content>.*)\);.*tabindex')
-        name_regular = re.compile(r'<h2 itemprop="name">(?P<name>.*)</h2>')
-
-        for div in search_results.find_all('div', class_='detailedsearch_result'):
-            try:
-                jdata = json.loads(json_data_regular.search(str(div)).group('json_content'))
-                """
-                for item, value in jdata.items():
-                    print '{0}: {1} \n'.format(item, value)
-                """
-                html_profile = self.get_profile_by_url(jdata['cururl'])
-                name = name_regular.search(html_profile).group('name')
-                user = User(name=name, username=jdata['id'], json_context=jdata)
-                user.add()
-            except Exception as error:
-                print error
-                pass
+        json_regular = re.compile(r"value='(?P<json_content>.*)'>")
+        for div in search_results.find_all('div', class_='stream-item-header'):
+            username = regular_username.search(str(div)).group('username')
+            if check_username(username):
+                try:
+                    profile_page = BeautifulSoup(self.get_profile(username))
+                    input_hidden_data =  profile_page.find(id='init-data')
+                    jdata = json.loads(json_regular.search(str(input_hidden_data)).group('json_content'))
+                    name = jdata['profile_user']['name']
+                    popularity_index = jdata['profile_user']['followers_count']
+                    user = User(username=username, name=name, json_context=jdata,
+                                source=User.SOURCE_ENUM.TWITTER, popularity_index=popularity_index)
+                    user.add()
+                except Exception as error:
+                    pass
 
 def index_profiles_by_term(term_list):
     for term in term_list:

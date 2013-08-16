@@ -10,7 +10,7 @@ class APIView(MethodView):
         http://flask.pocoo.org/docs/views/#method-based-dispatching.
     """
 
-    ENDPOINT = '/mymusic/api/v1.0'
+    ENDPOINT = '/social-scraper/api/v1.0'
 
     def get(self):
         abort(400)

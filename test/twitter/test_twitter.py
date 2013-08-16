@@ -8,4 +8,4 @@ class TwitterTestCase(ApiBaseTestCase):
         term = 'Jhon Smith'
         scraper = TwitterScraper()
         scraper.search_profile_by_term(term)
-        #self.assertNotEquals(0, User.objects.filter_by().count())
+        self.assertNotEquals(0, User.objects.filter_by().count())
