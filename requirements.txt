@@ -1,0 +1,5 @@
+Flask
+sqlalchemy
+ipdb
+beautifulsoup4
+httplib2
